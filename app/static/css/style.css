@@ -1,0 +1,15 @@
+body {
+      /*background: rgb(200, 170, 110);*/
+      /*background: rgb(212, 192, 117);*/
+      background: lightyellow;
+      font: 18px Arial, sans-serif;
+}
+
+body h1:first-child {
+      font-size: 50px;
+      font-family: monospace;
+      color: black;
+      margin: auto;
+      width: 100%;
+      text-align: center;
+}
