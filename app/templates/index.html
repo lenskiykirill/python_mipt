@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+
+<HTML>
+      <HEAD>
+            <TITLE>Toxine</TITLE>
+            <meta http-equiv="content-type" content="text/HTML;charset=UTF-8">
+            <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+            <script language="javascript">
+                  function register() {
+                        var username = "John"
+                        var password = "Kramer"
+
+                        var xhr = new XMLHttpRequest();
+
+                        xhr.open ("POST", '/api/register', true);
+                        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        
+                        xhr.onreadystatechange = function() {
+                              if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
+                                    console.log ("Success!\n")
+                        }
+                        
+                        xhr.send("username="+username+"& password="+password);
+                  }
+
+                  function get_articles() {
+                        var display = document.getElementById("article_display");
+                        display.innerHTML = "";
+                        
+                        var xhr = new XMLHttpRequest();
+                        xhr.open ("POST", '/api/articles');
+                        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                        xhr.onreadystatechange = function() {
+                              if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                                    var articles_json = xhr.responseText;
+
+                                    var data = JSON.parse(articles_json);
+
+                                    for (var row = 0; row < data.length; row++) {
+                                          let p = form_article(data[row][0],
+                                                               data[row][1],
+                                                               data[row][2]);
+
+                                          display.appendChild(p);
+                                    }
+                              }
+                        }
+                        
+                        xhr.send();
+                  }
+
+                  function get_user_by_id (id) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open ("POST", '/api/get_username', false);
+                        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+                        xhr.send("id="+id)
+                        let data = xhr.responseText;
+                        console.log(data);
+                        
+                        return data;
+                  }
+
+                  function form_article(id, time, text) {
+                        let div = document.createElement('div')
+                        div.style = "border: solid"
+                        
+                        let username = get_user_by_id (id);
+                        console.log("username:",username)
+                        
+                        div.innerHTML += "<div color=\"blue\">"+username+"</div>"
+                        div.innerHTML += text;
+                        return div;
+                  }
+
+                  function send_message() {
+                        var input = document.getElementById("user_input");
+                        var user_text = input.value;
+
+                        console.log(user_text);
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open ("POST", '/api/create_article');
+                        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        
+                        xhr.onreadystatechange = function () { 
+                              if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                                    get_articles();
+                                    console.log("OK")
+                              }
+                        }
+
+                        xhr.send("id=0&text="+encodeURI(user_text));
+                        input.value = "";
+                  }
+            </script>
+
+      </HEAD>
+      <BODY onload="get_articles()">
+            <div id="article_display"></div>
+            <textarea rows="5" cols="80" id="user_input"></textarea>
+            <div>
+                  <input type="button" value="Reload!" onclick="get_articles()"/>
+                  <input type="button" value="Send!" onclick="send_message()"/>
+            </div>
+</textarea>
+
+      </BODY>
+</HTML>
